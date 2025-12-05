@@ -19,6 +19,10 @@
     )
 
     for backend in _BACKENDS
+        if backend[1] == "Enzyme"
+            continue
+        end
+
         testset_name = "ECEF to ECEF Time " * string(backend[1])
 
         @testset "$testset_name" begin
@@ -40,6 +44,27 @@
             end
         end
     end
+
+    testset_name = "ECEF to ECEF Time Enzyme"
+
+    @testset "$testset_name" begin
+        for frames in frame_sets
+            f_fd, df_fd = value_and_derivative(
+                (x) -> Array(r_ecef_to_ecef(frames[1], frames[2], x, frames[3])),
+                AutoFiniteDiff(),
+                jd_utc
+            )
+
+            f_ad, df_ad = value_and_derivative(
+                Const((x) -> Array(r_ecef_to_ecef(frames[1], frames[2], x, frames[3]))),
+                AutoEnzyme(),
+                jd_utc
+            )
+
+            @test f_fd ≈ f_ad rtol=1e-14
+            @test df_fd ≈ df_ad rtol=1e-4
+        end
+    end
 end
 
 @testset "ECEF to ECI Time Automatic Differentiation" verbose = true begin
@@ -57,6 +82,9 @@ end
     )
 
     for backend in _BACKENDS
+        if backend[1] == "Enzyme"
+            continue
+        end
         testset_name = "ECEF to ECI Time " * string(backend[1])
         @testset "$testset_name" begin
             for frames in frame_sets
@@ -77,6 +105,27 @@ end
             end
         end
     end
+
+    testset_name = "ECEF to ECI Time Enzyme"
+
+    @testset "$testset_name" begin
+        for frames in frame_sets
+            f_fd, df_fd = value_and_derivative(
+                (x) -> Array(r_ecef_to_eci(frames[1], frames[2], x, frames[3])),
+                AutoFiniteDiff(),
+                jd_utc
+            )
+
+            f_ad, df_ad = value_and_derivative(
+                Const((x) -> Array(r_ecef_to_eci(frames[1], frames[2], x, frames[3]))),
+                AutoEnzyme(),
+                jd_utc
+            )
+
+            @test f_fd ≈ f_ad rtol=1e-14
+            @test df_fd ≈ df_ad rtol=2e-1
+        end
+    end
 end
 
 @testset "ECI to ECEF Time Automatic Differentiation" verbose = true begin
@@ -94,6 +143,10 @@ end
     )
 
     for backend in _BACKENDS
+        if backend[1] == "Enzyme"
+            continue
+        end
+
         testset_name = "ECI to ECEF Time " * string(backend[1])
         @testset "$testset_name" begin
             for frames in frame_sets
@@ -112,6 +165,27 @@ end
                 @test f_fd ≈ f_ad rtol=1e-14
                 @test df_fd ≈ df_ad rtol=2e-1
             end
+        end
+    end
+
+    testset_name = "ECI to ECEF Time Enzyme"
+
+    @testset "$testset_name" begin
+        for frames in frame_sets
+            f_fd, df_fd = value_and_derivative(
+                (x) -> Array(r_eci_to_ecef(frames[1], frames[2], x, frames[3])),
+                AutoFiniteDiff(),
+                jd_utc
+            )
+
+            f_ad, df_ad = value_and_derivative(
+                Const((x) -> Array(r_eci_to_ecef(frames[1], frames[2], x, frames[3]))),
+                AutoEnzyme(),
+                jd_utc
+            )
+
+            @test f_fd ≈ f_ad rtol=1e-14
+            @test df_fd ≈ df_ad rtol=2e-1
         end
     end
 end
@@ -137,7 +211,7 @@ end
     )
 
     for backend in _BACKENDS
-        if backend[1] == "Zygote"
+        if backend[1] == "Zygote" || backend[1] == "Enzyme"
             continue
         end
         testset_name = "ECI to ECI Time " * string(backend[1])
@@ -185,6 +259,26 @@ end
             end
         end
     end
+
+    testset_name = "ECI to ECI Time Enzyme"
+    @testset "$testset_name" begin
+        for frames in frame_sets
+            f_fd, df_fd = value_and_derivative(
+                (x) -> Array(r_eci_to_eci(frames[1], frames[2], x, frames[3])),
+                AutoFiniteDiff(),
+                jd_utc
+            )
+
+            f_ad, df_ad = value_and_derivative(
+                Const((x) -> Array(r_eci_to_eci(frames[1], frames[2], x, frames[3]))),
+                AutoEnzyme(),
+                jd_utc
+            )
+
+            @test f_fd ≈ f_ad rtol=1e-14
+            @test df_fd ≈ df_ad rtol=2e-1
+        end
+    end
 end
 
 @testset "ECI to ECI Time Automatic Differentiation" verbose = true begin
@@ -205,6 +299,9 @@ end
     )
 
     for backend in _BACKENDS
+        if backend[1] == "Enzyme"
+            continue
+        end
         testset_name = "ECI to ECI Time " * string(backend[1])
         @testset "$testset_name" begin
             for frames in frame_sets
@@ -223,6 +320,26 @@ end
                 @test f_fd ≈ f_ad rtol=1e-14
                 @test df_fd ≈ df_ad atol=1e-4
             end
+        end
+    end
+
+    testset_name = "ECI to ECI Time Enzyme"
+    @testset "$testset_name" begin
+        for frames in frame_sets
+            f_fd, df_fd = value_and_derivative(
+                (x) -> Array(r_eci_to_eci(frames[1], x, frames[2], x, frames[3])),
+                AutoFiniteDiff(),
+                jd_utc
+            )
+
+            f_ad, df_ad = value_and_derivative(
+                Const((x) -> Array(r_eci_to_eci(frames[1], x, frames[2], x, frames[3]))),
+                AutoEnzyme(),
+                jd_utc
+            )
+
+            @test f_fd ≈ f_ad rtol=1e-14
+            @test df_fd ≈ df_ad atol=1e-4
         end
     end
 end

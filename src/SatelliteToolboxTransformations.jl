@@ -4,7 +4,7 @@ using Crayons
 using Dates
 using DelimitedFiles
 using Downloads: download
-using DataInterpolations
+using Interpolations
 using LinearAlgebra
 using ReferenceFrameRotations
 using Reexport
